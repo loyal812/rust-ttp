@@ -13,7 +13,7 @@ struct Args {
     file: PathBuf,
 
     /// Use this flag to reverse parsing of a theme
-    /// 
+    ///
     /// You have to provide a .ttp file in <theme>
     #[clap(short, long, action)]
     revert: bool,
@@ -29,14 +29,13 @@ struct Args {
 
 fn main() {
     let args = Args::parse();
-    let contents: String;
-    match fs::read_to_string(&args.file) {
-        Ok(c) => contents = c,
+    let contents: String = match fs::read_to_string(&args.file) {
+        Ok(c) => c,
         Err(e) => {
             println!("Failed to read the file: {e}");
             process::exit(1);
         }
-    }
+    };
     if contents.is_empty() {
         println!("File is empty");
         process::exit(1);
@@ -65,28 +64,26 @@ fn main() {
                 };
                 if parts[1].is_empty() {
                     println!("Weird line (empty parameter): {x}");
-                    return None;
+                    None
                 } else if parts[2].is_empty() {
                     println!("Weird line (empty value or value is not a number): {x}");
-                    return None;
+                    None
+                } else if args.revert {
+                    Some(format!(
+                        "{}={}",
+                        &parts[1],
+                        u32::from_str_radix(&parts[2], 16).unwrap_or_default() as i32
+                    ))
                 } else {
-                    return if args.revert {
-                        Some(format!(
-                            "{}={}",
-                            &parts[1],
-                            u32::from_str_radix(&parts[2], 16).unwrap_or_default() as i32 
-                        ))
-                    } else {
-                        Some(format!(
-                            "{}: #{:08X}",
-                            &parts[1],
-                            &parts[2].parse::<i32>().unwrap_or_default()
-                        ))
-                    };
+                    Some(format!(
+                        "{}: #{:08X}",
+                        &parts[1],
+                        &parts[2].parse::<i32>().unwrap_or_default()
+                    ))
                 }
             } else {
                 println!("Weird line (can't parse): {x}");
-                return None;
+                None
             }
         })
         .collect::<Vec<String>>();
@@ -97,11 +94,10 @@ fn main() {
         println!("There's nothing to write!");
         process::exit(1);
     }
-    let outpath: String;
-    match args.output {
-        Some(path) => outpath = path.to_str().unwrap_or("out").to_owned(),
+    let outpath: String = match args.output {
+        Some(path) => path.to_str().unwrap_or("out").to_owned(),
         None => {
-            outpath = format!(
+            format!(
                 "{}.{}",
                 &args
                     .file
@@ -112,13 +108,12 @@ fn main() {
                 if args.revert { "attheme" } else { "ttp" }
             )
         }
-    }
+    };
     match fs::write(&outpath, lines.join("\n")) {
         Ok(_o) => println!("Done writing to file: {}", outpath),
         Err(e) => {
             println!("Error writing to file: {e}");
             process::exit(1);
         }
-    }
-    0;
+    };
 }
