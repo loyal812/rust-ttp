@@ -6,7 +6,7 @@ USAGE:
     ttp [OPTIONS] <theme>
 
 ARGS:
-    <theme>    Path to the .attheme file
+    <theme>    Path to the .attheme (or .ttp if used with -r) file
 
 OPTIONS:
     -h, --help       Print help information

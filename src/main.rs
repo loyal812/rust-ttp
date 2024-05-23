@@ -8,7 +8,7 @@ use std::process;
 #[derive(Parser)]
 #[clap(name = "Telegram theme parser", author, version, about)]
 struct Args {
-    /// Path to the .attheme file
+    /// Path to the .attheme (or .ttp if used with -r) file
     #[clap(value_parser, value_name = "theme")]
     file: PathBuf,
 
