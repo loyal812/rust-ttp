@@ -1,6 +1,6 @@
 [package]
 name = "ttp"
-version = "0.1.0"
+version = "0.1.1"
 authors = [ "Viktor D. <dudnik.0x76@gmail.com>" ]
 description = "Parses telegram mobile .attheme file to readable colors"
 edition = "2021"

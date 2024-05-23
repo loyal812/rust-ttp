@@ -20,6 +20,10 @@ struct Args {
     /// Use this flag to sort lines in alphabetical order.
     #[clap(short, long, action)]
     sort: bool,
+
+    /// Path to the output file
+    #[clap(short, long, value_parser)]
+    output: Option<PathBuf>,
 }
 
 fn main() {
@@ -80,18 +84,22 @@ fn main() {
         println!("There's nothing to write!");
         process::exit(1);
     }
-    _ = fs::write(
-        format!(
-            "{}.{}",
-            &args
-                .file
-                .file_stem()
-                .expect("No file provided")
-                .to_str()
-                .unwrap(),
-            if args.revert { "attheme" } else { "ttp" }
-        ),
-        lines.join("\n"),
-    );
+    let outpath: String;
+    match args.output {
+        Some(path) => outpath = path.to_str().unwrap().to_owned(),
+        None => {
+            outpath = format!(
+                "{}.{}",
+                &args
+                    .file
+                    .file_stem()
+                    .expect("No file provided")
+                    .to_str()
+                    .unwrap(),
+                if args.revert { "attheme" } else { "ttp" }
+            )
+        }
+    }
+    _ = fs::write(outpath, lines.join("\n"));
     0;
 }
