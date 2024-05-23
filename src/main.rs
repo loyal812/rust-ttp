@@ -33,7 +33,7 @@ fn main() {
         process::exit(1);
     }
     let pattern = if args.revert {
-        Regex::new(r"^([a-zA-Z_\d]*): #([A-Fa-f\d]*)$").unwrap()
+        Regex::new(r"^([a-zA-Z_\d]*): #([A-Fa-f\d]{8})$").unwrap()
     } else {
         Regex::new(r"^([a-zA-Z_\d]*)=(-?\d*)$").unwrap()
     };
@@ -70,6 +70,10 @@ fn main() {
         })
         .collect::<Vec<String>>();
     lines.sort();
+    if lines.is_empty() {
+        println!("There's nothing to write!");
+        process::exit(1);
+    }
     _ = fs::write(
         format!(
             "{}.{}",
