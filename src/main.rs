@@ -16,6 +16,10 @@ struct Args {
     /// You have to provide a .ttp file in <theme>
     #[clap(short, long, action)]
     revert: bool,
+
+    /// Use this flag to sort lines in alphabetical order.
+    #[clap(short, long, action)]
+    sort: bool,
 }
 
 fn main() {
@@ -69,7 +73,9 @@ fn main() {
             }
         })
         .collect::<Vec<String>>();
-    lines.sort();
+    if args.sort {
+        lines.sort();
+    }
     if lines.is_empty() {
         println!("There's nothing to write!");
         process::exit(1);
