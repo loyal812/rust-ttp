@@ -11,6 +11,11 @@ struct Args {
     /// Path to the .attheme file
     #[clap(value_parser, value_name = "theme")]
     file: PathBuf,
+
+    /// Use this flag to reverse parsing of a theme.
+    /// You have to provide a .ttp file in <theme>
+    #[clap(short, long, action)]
+    revert: bool,
 }
 
 fn main() {
@@ -27,7 +32,11 @@ fn main() {
         println!("File is empty");
         process::exit(1);
     }
-    let pattern = Regex::new(r"^([a-zA-Z_\d]*)=(-?\d*)$").unwrap();
+    let pattern = if args.revert {
+        Regex::new(r"^([a-zA-Z_\d]*): #([A-Fa-f\d]*)$").unwrap()
+    } else {
+        Regex::new(r"^([a-zA-Z_\d]*)=(-?\d*)$").unwrap()
+    };
     let mut lines: Vec<String> = contents
         .lines()
         .filter_map(|x| {
@@ -40,11 +49,19 @@ fn main() {
                     println!("Weird line (empty value or value is not a number): {x}");
                     return None;
                 } else {
-                    return Some(format!(
-                        "{}: #{:08X}",
-                        &parts[1],
-                        &parts[2].parse::<i32>().unwrap()
-                    ));
+                    return if args.revert {
+                        Some(format!(
+                            "{}={}",
+                            &parts[1],
+                            u32::from_str_radix(&parts[2], 16).expect("Invalid hex value") as i32
+                        ))
+                    } else {
+                        Some(format!(
+                            "{}: #{:08X}",
+                            &parts[1],
+                            &parts[2].parse::<i32>().unwrap()
+                        ))
+                    };
                 }
             } else {
                 println!("Weird line (can't parse): {x}");
@@ -55,13 +72,14 @@ fn main() {
     lines.sort();
     _ = fs::write(
         format!(
-            "{}.ttp",
+            "{}.{}",
             &args
                 .file
                 .file_stem()
                 .expect("No file provided")
                 .to_str()
-                .unwrap()
+                .unwrap(),
+            if args.revert { "attheme" } else { "ttp" }
         ),
         lines.join("\n"),
     );
