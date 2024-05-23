@@ -1,6 +1,11 @@
 # ttp
 Telegram .attheme file parser written in Rust.
 
+**Install**
+```
+$ cargo install ttp
+```
+
 ```
 USAGE:
     ttp [OPTIONS] <theme>
@@ -9,11 +14,11 @@ ARGS:
     <theme>    Path to the .attheme (or .ttp if used with -r) file
 
 OPTIONS:
-    -h, --help       Print help information
-    -r, --revert     Use this flag to reverse parsing of a theme. You have to provide a .ttp file in
-                     <theme>
-    -s, --sort       Use this flag to sort lines in alphabetical order
-    -V, --version    Print version information
+    -h, --help               Print help information
+    -o, --output <OUTPUT>    Path to the output file
+    -r, --revert             Use this flag to reverse parsing of a theme
+    -s, --sort               Use this flag to sort lines in alphabetical order
+    -V, --version            Print version information
 ```
 
 **Examples**

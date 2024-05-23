@@ -12,12 +12,13 @@ struct Args {
     #[clap(value_parser, value_name = "theme")]
     file: PathBuf,
 
-    /// Use this flag to reverse parsing of a theme.
+    /// Use this flag to reverse parsing of a theme
+    /// 
     /// You have to provide a .ttp file in <theme>
     #[clap(short, long, action)]
     revert: bool,
 
-    /// Use this flag to sort lines in alphabetical order.
+    /// Use this flag to sort lines in alphabetical order
     #[clap(short, long, action)]
     sort: bool,
 
