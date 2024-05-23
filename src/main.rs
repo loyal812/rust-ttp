@@ -27,28 +27,32 @@ fn main() {
         println!("File is empty");
         process::exit(1);
     }
-    let mut lines: Vec<&str> = contents.lines().map(|x| x.trim()).collect::<Vec<&str>>();
-    lines.sort();
-    let mut lines_parsed: Vec<String> = vec![];
     let pattern = Regex::new(r"^([a-zA-Z_\d]*)=(-?\d*)$").unwrap();
-    for line in lines {
-        if pattern.is_match(line) {
-            let parts = pattern.captures(line).unwrap();
-            if parts[1].is_empty() {
-                println!("Weird line (empty parameter): {line}");
-            } else if parts[2].is_empty() {
-                println!("Weird line (empty value or value is not a number): {line}");
+    let mut lines: Vec<String> = contents
+        .lines()
+        .filter_map(|x| {
+            if pattern.is_match(x) {
+                let parts = pattern.captures(x).unwrap();
+                if parts[1].is_empty() {
+                    println!("Weird line (empty parameter): {x}");
+                    return None;
+                } else if parts[2].is_empty() {
+                    println!("Weird line (empty value or value is not a number): {x}");
+                    return None;
+                } else {
+                    return Some(format!(
+                        "{}: #{:08X}",
+                        &parts[1],
+                        &parts[2].parse::<i32>().unwrap()
+                    ));
+                }
             } else {
-                lines_parsed.push(format!(
-                    "{}: #{:08X}",
-                    &parts[1],
-                    &parts[2].parse::<i32>().unwrap()
-                ))
+                println!("Weird line (can't parse): {x}");
+                return None;
             }
-        } else {
-            println!("Weird line (can't parse): {line}");
-        }
-    }
+        })
+        .collect::<Vec<String>>();
+    lines.sort();
     _ = fs::write(
         format!(
             "{}.ttp",
@@ -59,7 +63,7 @@ fn main() {
                 .to_str()
                 .unwrap()
         ),
-        lines_parsed.join("\n"),
+        lines.join("\n"),
     );
     0;
 }
